@@ -1,5 +1,12 @@
 import express from "express";
-import { config, getMissingSecrets, hasRequiredSecrets, requireSecret } from "./config.js";
+import {
+  config,
+  getMissingSecrets,
+  hasRequiredSecrets,
+  hasWebhookVerificationSecret,
+  requireWebhookVerificationSecret,
+  requireSecret
+} from "./config.js";
 import { handleReceptionistMessage } from "./services/botService.js";
 import { sendWhatsAppText } from "./services/whatsappService.js";
 
@@ -18,11 +25,10 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/webhooks/whatsapp", (req, res) => {
-  if (!hasRequiredSecrets()) {
+  if (!hasWebhookVerificationSecret()) {
     return res.status(503).json({
       ok: false,
-      error: "Service is missing required environment variables.",
-      missingSecrets: getMissingSecrets()
+      error: "Service is missing WHATSAPP_VERIFY_TOKEN."
     });
   }
 
@@ -30,7 +36,7 @@ app.get("/webhooks/whatsapp", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode === "subscribe" && token === requireSecret("WHATSAPP_VERIFY_TOKEN")) {
+  if (mode === "subscribe" && token === requireWebhookVerificationSecret()) {
     return res.status(200).send(challenge);
   }
 

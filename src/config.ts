@@ -18,7 +18,6 @@ const envSchema = z.object({
 export const config = envSchema.parse(process.env);
 
 const requiredSecrets = [
-  "WHATSAPP_VERIFY_TOKEN",
   "WHATSAPP_ACCESS_TOKEN",
   "WHATSAPP_PHONE_NUMBER_ID",
   "OPENAI_API_KEY"
@@ -30,8 +29,22 @@ export function getMissingSecrets(): RequiredSecret[] {
   return requiredSecrets.filter((key) => !config[key]);
 }
 
+export function hasWebhookVerificationSecret(): boolean {
+  return Boolean(config.WHATSAPP_VERIFY_TOKEN);
+}
+
+export function requireWebhookVerificationSecret(): string {
+  const value = config.WHATSAPP_VERIFY_TOKEN;
+
+  if (!value) {
+    throw new Error("Missing required environment variable: WHATSAPP_VERIFY_TOKEN");
+  }
+
+  return value;
+}
+
 export function hasRequiredSecrets(): boolean {
-  return getMissingSecrets().length === 0;
+  return hasWebhookVerificationSecret() && getMissingSecrets().length === 0;
 }
 
 export function requireSecret(key: RequiredSecret): string {
