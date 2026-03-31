@@ -47,6 +47,8 @@ app.post("/webhooks/whatsapp", async (req, res) => {
   res.sendStatus(200);
 
   try {
+    console.log("Incoming WhatsApp webhook", JSON.stringify(req.body));
+
     if (!hasRequiredSecrets()) {
       console.warn("Webhook received but required environment variables are missing", {
         missingSecrets: getMissingSecrets()
@@ -60,6 +62,7 @@ app.post("/webhooks/whatsapp", async (req, res) => {
     const message = value?.messages?.[0];
 
     if (!message || message.type !== "text") {
+      console.log("Ignoring non-text or empty webhook event");
       return;
     }
 
@@ -78,6 +81,10 @@ app.post("/webhooks/whatsapp", async (req, res) => {
       phoneNumberId: requireSecret("WHATSAPP_PHONE_NUMBER_ID"),
       to: customerPhone,
       body: reply
+    });
+
+    console.log("WhatsApp reply sent", {
+      to: customerPhone
     });
   } catch (error) {
     console.error("Failed to process WhatsApp webhook", error);
