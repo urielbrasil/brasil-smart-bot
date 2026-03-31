@@ -1,10 +1,6 @@
 import OpenAI from "openai";
-import { config } from "../config.js";
+import { config, requireSecret } from "../config.js";
 import { AvailabilitySnapshot, BookingRequest } from "../types.js";
-
-const client = new OpenAI({
-  apiKey: config.OPENAI_API_KEY
-});
 
 export async function generateReceptionistReply(input: {
   customerMessage: string;
@@ -12,6 +8,10 @@ export async function generateReceptionistReply(input: {
   calendarAvailability: AvailabilitySnapshot;
   bookingAvailability: AvailabilitySnapshot;
 }): Promise<string> {
+  const client = new OpenAI({
+    apiKey: requireSecret("OPENAI_API_KEY")
+  });
+
   const response = await client.responses.create({
     model: config.OPENAI_MODEL,
     input: [
