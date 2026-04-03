@@ -7,7 +7,7 @@ import {
   requireWebhookVerificationSecret,
   requireSecret
 } from "./config.js";
-import { handleReceptionistMessage } from "./services/botService.js";
+import { handleBotMessage } from "./services/botService.js";
 import { sendWhatsAppText } from "./services/whatsappService.js";
 
 const app = express();
@@ -19,7 +19,7 @@ app.get("/health", (_req, res) => {
 
   res.json({
     ok: missingSecrets.length === 0,
-    service: "brasil-smart-bot",
+    service: "whatsapp-bot",
     missingSecrets
   });
 });
@@ -70,7 +70,7 @@ app.post("/webhooks/whatsapp", async (req, res) => {
     const customerName = value?.contacts?.[0]?.profile?.name;
     const customerMessage = message.text?.body ?? "";
 
-    const reply = await handleReceptionistMessage({
+    const reply = await handleBotMessage({
       customerName,
       customerPhone,
       customerMessage
@@ -92,5 +92,5 @@ app.post("/webhooks/whatsapp", async (req, res) => {
 });
 
 app.listen(config.PORT, () => {
-  console.log(`brasil-smart-bot listening on port ${config.PORT}`);
+  console.log(`whatsapp-bot listening on port ${config.PORT}`);
 });

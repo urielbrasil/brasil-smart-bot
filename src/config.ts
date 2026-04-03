@@ -10,9 +10,7 @@ const envSchema = z.object({
   WHATSAPP_ACCESS_TOKEN: z.string().min(1).optional(),
   WHATSAPP_PHONE_NUMBER_ID: z.string().min(1).optional(),
   OPENAI_API_KEY: z.string().min(1).optional(),
-  OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
-  CALENDAR_PROVIDER: z.enum(["mock", "google-calendar", "calcom"]).default("mock"),
-  BOOKING_PROVIDER: z.enum(["mock", "booking-com"]).default("mock")
+  OPENAI_MODEL: z.string().default("gpt-4.1-mini")
 });
 
 export const config = envSchema.parse(process.env);

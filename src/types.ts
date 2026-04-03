@@ -1,20 +1,32 @@
-export type AvailabilitySlot = {
-  startIso: string;
-  endIso: string;
-  source: "calendar" | "booking";
-  notes?: string;
+export type ConversationStage =
+  | "awaiting_business_choice"
+  | "awaiting_custom_business"
+  | "awaiting_product"
+  | "in_simulation";
+
+export type BusinessOption = {
+  id: string;
+  label: string;
+  keywords: string[];
+  menuNumber: number;
 };
 
-export type BookingRequest = {
+export type ConversationState = {
   customerName: string;
   customerPhone: string;
-  partySize?: number;
-  requestedDate: string;
-  requestedTime?: string;
-  stayNights?: number;
+  stage: ConversationStage;
+  selectedBusiness?: string;
+  selectedBusinessLabel?: string;
+  productToSell?: string;
+  scenarioSummary?: string;
+  turns: number;
+  lastUpdatedAt: string;
 };
 
-export type AvailabilitySnapshot = {
-  summary: string;
-  slots: AvailabilitySlot[];
+export type ScenarioReplyInput = {
+  customerName: string;
+  businessType: string;
+  productToSell: string;
+  customerMessage: string;
+  scenarioSummary: string;
 };

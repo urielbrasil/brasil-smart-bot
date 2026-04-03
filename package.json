@@ -1,7 +1,7 @@
 {
-  "name": "brasil-smart-bot",
+  "name": "whatsapp-bot",
   "version": "0.1.0",
-  "description": "WhatsApp receptionist bot with OpenAI, Meta WhatsApp Cloud API, and availability provider integrations.",
+  "description": "WhatsAppBot intelligence backend for sales simulation with OpenAI and Meta WhatsApp Cloud API.",
   "private": true,
   "type": "module",
   "engines": {
