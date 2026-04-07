@@ -3,7 +3,7 @@ import { AutomationOption } from "../types.js";
 export const automationOptions: AutomationOption[] = [
   {
     id: "atendimento",
-    label: "Atendimento ao cliente",
+    label: "Atendimento inteligente",
     keywords: ["1", "atendimento", "suporte", "duvidas", "cliente"],
     menuNumber: 1
   },
@@ -15,7 +15,7 @@ export const automationOptions: AutomationOption[] = [
   },
   {
     id: "vendas",
-    label: "Vendas e recuperacao de oportunidades",
+    label: "Vendas no WhatsApp",
     keywords: ["3", "vendas", "comercial", "conversao", "recuperacao"],
     menuNumber: 3
   },
@@ -27,7 +27,7 @@ export const automationOptions: AutomationOption[] = [
   },
   {
     id: "pos-venda",
-    label: "Pos-venda e relacionamento",
+    label: "Relacionamento e pos-venda",
     keywords: ["5", "pos-venda", "relacionamento", "fidelizacao", "suporte interno"],
     menuNumber: 5
   },

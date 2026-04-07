@@ -16,9 +16,9 @@ function buildBusinessMenu(customerName?: string): string {
   const firstName = customerName?.trim().split(/\s+/)[0] ?? "cliente";
 
   return [
-    `Ola, ${firstName}. A Brasil Smart pode transformar seu WhatsApp em um canal inteligente de atendimento, qualificacao e vendas.`,
+    `Ola, ${firstName}. A Brasil Smart transforma seu WhatsApp em um canal inteligente de atendimento, qualificacao e vendas.`,
     "",
-    "Escolha o objetivo principal da automacao que voce quer implantar:",
+    "Escolha o tipo de resultado que voce quer colocar para funcionar no seu WhatsApp:",
     ...automationOptions.map((option) => `${option.menuNumber}. ${option.label}`),
     "",
     "Se quiser recomecar a qualquer momento, envie: menu"
@@ -101,7 +101,7 @@ export async function handleBotMessage(input: {
         stage: "awaiting_custom_automation"
       });
 
-      return "Perfeito. Qual objetivo principal da automacao voce quer implantar no seu WhatsApp?";
+      return "Perfeito. Me diga qual tipo de atendimento, processo ou operacao voce quer automatizar no seu WhatsApp.";
     }
 
     saveConversationState({
@@ -111,7 +111,7 @@ export async function handleBotMessage(input: {
       selectedAutomationLabel: selectedOption.label
     });
 
-    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}.`;
+    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}. Pode ser, por exemplo, atendimento inicial, triagem, agendamento, recuperacao de leads ou suporte.`;
   }
 
   if (state.stage === "awaiting_custom_automation") {
@@ -150,7 +150,7 @@ export async function handleBotMessage(input: {
     customerMessage,
     implementationSummary:
       state.implementationSummary ??
-      "Implantacao consultiva de automacao no WhatsApp com atendimento inicial, qualificacao e encaminhamento humano."
+      "Implantacao consultiva no WhatsApp com atendimento inteligente, qualificacao automatica e repasse para a equipe no momento certo."
   });
 
   saveConversationState({
