@@ -1,13 +1,13 @@
 # WhatsAppBot
 
-Backend Node.js + TypeScript da inteligencia do WhatsAppBot, focado em simulacao de vendas no WhatsApp.
+Backend Node.js + TypeScript da inteligencia do WhatsAppBot, focado em atendimento consultivo sobre automacao de WhatsApp para negocios.
 
 ## Identity
 
 Este repositorio contem apenas a inteligencia do bot:
 
 - Meta Developers / WhatsApp Cloud API
-- OpenAI for guided commercial scenarios
+- OpenAI for guided commercial conversations
 - Railway for deployment
 - GitHub for source control and CI-ready structure
 
@@ -22,12 +22,12 @@ Este repositorio deve espelhar o proposito de `urielbrasil/WhatsAppBot`: backend
 
 - Exposes a WhatsApp webhook endpoint for Meta verification and incoming messages
 - Reads WhatsApp and OpenAI secrets from environment variables
-- Starts the conversation with a menu of business types
-- Supports an `Outros` path for custom business simulations
-- Asks which product or service the user wants to sell
-- Creates a hypothetical local business setting and continues the sale simulation
+- Starts the conversation with a menu of automation goals
+- Supports an `Outros` path for custom automation needs
+- Asks which service, process, or business step should be automated
+- Explains how the contracted service would be implemented and operate in practice
 - Keeps a short in-memory conversation state per WhatsApp number
-- Uses OpenAI to generate Portuguese-BR commercial replies
+- Uses OpenAI to generate Portuguese-BR consultative replies
 - Is ready to deploy on Railway
 
 ## Local separation
@@ -95,20 +95,20 @@ Copy `.env.example` to `.env` and fill in:
 ## Conversation flow
 
 1. User sends any message to the WhatsApp number.
-2. Bot replies with a menu of business segments.
-3. User chooses a segment or `Outros`.
-4. Bot asks what product or service should be sold.
-5. Bot creates a hypothetical business environment and starts the simulation.
-6. Every next message keeps the sales conversation focused on the chosen product.
+2. Bot replies with a menu of automation goals.
+3. User chooses a goal or `Outros`.
+4. Bot asks which service, process, or business step should be automated.
+5. Bot explains how Brasil Smart would implement the automation in that case.
+6. Every next message continues the conversation as consultative guidance about setup, operation, and next steps.
 
 Send `menu` at any point to restart the flow.
 
 ## Recommended next implementation
 
-1. Persist conversation state in Redis or PostgreSQL so Railway restarts do not reset active simulations.
+1. Persist conversation state in Redis or PostgreSQL so Railway restarts do not reset active consultations.
 2. Add WhatsApp templates for proactive re-engagement.
 3. Add admin analytics for business type, product, and conversion stage.
-4. Add optional CRM handoff when a simulation should become a real lead.
+4. Add optional CRM handoff when a qualified conversation should become a real lead.
 
 ## Project structure
 

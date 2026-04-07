@@ -1,10 +1,10 @@
 export type ConversationStage =
-  | "awaiting_business_choice"
-  | "awaiting_custom_business"
-  | "awaiting_product"
-  | "in_simulation";
+  | "awaiting_automation_choice"
+  | "awaiting_custom_automation"
+  | "awaiting_service_to_automate"
+  | "in_consultation";
 
-export type BusinessOption = {
+export type AutomationOption = {
   id: string;
   label: string;
   keywords: string[];
@@ -15,18 +15,18 @@ export type ConversationState = {
   customerName: string;
   customerPhone: string;
   stage: ConversationStage;
-  selectedBusiness?: string;
-  selectedBusinessLabel?: string;
-  productToSell?: string;
-  scenarioSummary?: string;
+  selectedAutomation?: string;
+  selectedAutomationLabel?: string;
+  serviceToAutomate?: string;
+  implementationSummary?: string;
   turns: number;
   lastUpdatedAt: string;
 };
 
-export type ScenarioReplyInput = {
+export type ConsultationReplyInput = {
   customerName: string;
-  businessType: string;
-  productToSell: string;
+  automationGoal: string;
+  serviceToAutomate: string;
   customerMessage: string;
-  scenarioSummary: string;
+  implementationSummary: string;
 };

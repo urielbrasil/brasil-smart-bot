@@ -6,7 +6,7 @@ const body =
   process.argv.slice(3).join(" ").trim() ||
   [
     "Teste do WhatsAppBot: a integracao com o WhatsApp esta funcionando.",
-    "Envie 1, 2, 3, 4, 5, 6 ou 7 para iniciar a simulacao de vendas."
+    "Envie 1, 2, 3, 4, 5 ou 6 para iniciar a conversa sobre automacao do seu atendimento no WhatsApp."
   ].join(" ");
 
 if (!to) {

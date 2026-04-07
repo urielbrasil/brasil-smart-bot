@@ -7,8 +7,8 @@ import {
   resetConversationState,
   saveConversationState
 } from "./stateService.js";
-import { businessOptions } from "../data/businessOptions.js";
-import { BusinessOption, ConversationState } from "../types.js";
+import { automationOptions } from "../data/automationOptions.js";
+import { AutomationOption, ConversationState } from "../types.js";
 
 const restartKeywords = ["menu", "reiniciar", "reset", "comecar", "iniciar", "inicio"];
 
@@ -16,10 +16,10 @@ function buildBusinessMenu(customerName?: string): string {
   const firstName = customerName?.trim().split(/\s+/)[0] ?? "cliente";
 
   return [
-    `Ola, ${firstName}. Vamos simular uma venda no WhatsApp.`,
+    `Ola, ${firstName}. A Brasil Smart pode transformar seu WhatsApp em um canal inteligente de atendimento, qualificacao e vendas.`,
     "",
-    "Escolha o tipo de negocio para montar o cenario:",
-    ...businessOptions.map((option) => `${option.menuNumber}. ${option.label}`),
+    "Escolha o objetivo principal da automacao que voce quer implantar:",
+    ...automationOptions.map((option) => `${option.menuNumber}. ${option.label}`),
     "",
     "Se quiser recomecar a qualquer momento, envie: menu"
   ].join("\n");
@@ -38,10 +38,10 @@ function isRestartRequest(message: string): boolean {
   return restartKeywords.includes(normalized);
 }
 
-function resolveBusinessOption(message: string): BusinessOption | undefined {
+function resolveBusinessOption(message: string): AutomationOption | undefined {
   const normalized = normalizeMessage(message);
 
-  return businessOptions.find((option) =>
+  return automationOptions.find((option) =>
     option.keywords.some((keyword) => normalized === normalizeMessage(keyword))
   );
 }
@@ -53,7 +53,7 @@ function createBaseState(input: {
   return {
     customerName: input.customerName?.trim() || "Cliente",
     customerPhone: input.customerPhone,
-    stage: "awaiting_business_choice",
+    stage: "awaiting_automation_choice",
     turns: 0,
     lastUpdatedAt: new Date().toISOString()
   };
@@ -84,7 +84,7 @@ export async function handleBotMessage(input: {
     saveConversationState(state);
   }
 
-  if (state.stage === "awaiting_business_choice") {
+  if (state.stage === "awaiting_automation_choice") {
     const selectedOption = resolveBusinessOption(customerMessage);
 
     if (!selectedOption) {
@@ -98,45 +98,45 @@ export async function handleBotMessage(input: {
     if (selectedOption.id === "outros") {
       saveConversationState({
         ...state,
-        stage: "awaiting_custom_business"
+        stage: "awaiting_custom_automation"
       });
 
-      return "Perfeito. Qual tipo de negocio voce deseja simular?";
+      return "Perfeito. Qual objetivo principal da automacao voce quer implantar no seu WhatsApp?";
     }
 
     saveConversationState({
       ...state,
-      stage: "awaiting_product",
-      selectedBusiness: selectedOption.id,
-      selectedBusinessLabel: selectedOption.label
+      stage: "awaiting_service_to_automate",
+      selectedAutomation: selectedOption.id,
+      selectedAutomationLabel: selectedOption.label
     });
 
-    return `Perfeito. Agora me diga qual produto ou servico voce quer vender em uma simulacao de ${selectedOption.label}.`;
+    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}.`;
   }
 
-  if (state.stage === "awaiting_custom_business") {
+  if (state.stage === "awaiting_custom_automation") {
     saveConversationState({
       ...state,
-      stage: "awaiting_product",
-      selectedBusiness: "custom",
-      selectedBusinessLabel: customerMessage
+      stage: "awaiting_service_to_automate",
+      selectedAutomation: "custom",
+      selectedAutomationLabel: customerMessage
     });
 
-    return `Entendi. Agora me diga qual produto ou servico voce quer vender nessa simulacao de ${customerMessage}.`;
+    return `Entendi. Agora me diga qual servico, processo ou etapa voce quer automatizar nesse contexto de ${customerMessage}.`;
   }
 
-  if (state.stage === "awaiting_product") {
+  if (state.stage === "awaiting_service_to_automate") {
     const scenarioSummary = await createScenarioIntroduction({
       customerName: state.customerName,
-      businessType: state.selectedBusinessLabel ?? "negocio local",
-      productToSell: customerMessage
+      automationGoal: state.selectedAutomationLabel ?? "automacao comercial",
+      serviceToAutomate: customerMessage
     });
 
     saveConversationState({
       ...state,
-      stage: "in_simulation",
-      productToSell: customerMessage,
-      scenarioSummary,
+      stage: "in_consultation",
+      serviceToAutomate: customerMessage,
+      implementationSummary: scenarioSummary,
       turns: state.turns + 1
     });
 
@@ -145,17 +145,17 @@ export async function handleBotMessage(input: {
 
   const scenarioReply = await generateScenarioReply({
     customerName: state.customerName,
-    businessType: state.selectedBusinessLabel ?? "negocio local",
-    productToSell: state.productToSell ?? "produto principal",
+    automationGoal: state.selectedAutomationLabel ?? "automacao comercial",
+    serviceToAutomate: state.serviceToAutomate ?? "atendimento inicial",
     customerMessage,
-    scenarioSummary:
-      state.scenarioSummary ??
-      "Cenario hipotetico comercial em andamento com foco em venda consultiva."
+    implementationSummary:
+      state.implementationSummary ??
+      "Implantacao consultiva de automacao no WhatsApp com atendimento inicial, qualificacao e encaminhamento humano."
   });
 
   saveConversationState({
     ...state,
-    stage: "in_simulation",
+    stage: "in_consultation",
     turns: state.turns + 1
   });
 
