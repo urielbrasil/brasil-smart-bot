@@ -117,7 +117,7 @@ export async function handleBotMessage(input: {
         stage: "awaiting_custom_automation"
       });
 
-      return "Perfeito. Me diga qual atendimento, processo ou operacao voce quer automatizar no seu WhatsApp.";
+      return "Certo. Que atendimento, processo ou operacao voce quer automatizar no seu WhatsApp?";
     }
 
     saveConversationState({
@@ -127,7 +127,7 @@ export async function handleBotMessage(input: {
       selectedAutomationLabel: selectedOption.label
     });
 
-    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}. Ex.: atendimento inicial, triagem, agendamento, recuperacao de leads ou suporte.`;
+    return `Certo. Qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}? Ex.: atendimento inicial, triagem, agendamento, recuperacao de leads ou suporte.`;
   }
 
   if (state.stage === "awaiting_custom_automation") {
@@ -138,7 +138,7 @@ export async function handleBotMessage(input: {
       selectedAutomationLabel: customerMessage
     });
 
-    return `Entendi. Agora me diga qual servico, processo ou etapa voce quer automatizar nesse contexto de ${customerMessage}.`;
+    return `Entendi. Qual servico, processo ou etapa voce quer automatizar nesse contexto de ${customerMessage}?`;
   }
 
   if (state.stage === "awaiting_service_to_automate") {
