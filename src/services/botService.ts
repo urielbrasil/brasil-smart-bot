@@ -12,17 +12,28 @@ import { AutomationOption, ConversationState } from "../types.js";
 
 const restartKeywords = ["menu", "reiniciar", "reset", "comecar", "iniciar", "inicio"];
 
-function buildBusinessMenu(customerName?: string): string {
+function buildBusinessMenu(input?: {
+  customerName?: string;
+  includeGreeting?: boolean;
+}): string {
+  const customerName = input?.customerName;
+  const includeGreeting = input?.includeGreeting ?? false;
   const firstName = customerName?.trim().split(/\s+/)[0] ?? "cliente";
+  const lines: string[] = [];
 
-  return [
-    `Ola, ${firstName}. A Brasil Smart transforma seu WhatsApp em um canal inteligente de atendimento, qualificacao e vendas.`,
-    "",
+  if (includeGreeting) {
+    lines.push(`Ola, ${firstName}. A Brasil Smart transforma seu WhatsApp em um canal inteligente de atendimento, qualificacao e vendas.`);
+    lines.push("");
+  }
+
+  lines.push(
     "Escolha o tipo de resultado que voce quer colocar para funcionar no seu WhatsApp:",
     ...automationOptions.map((option) => `${option.menuNumber}. ${option.label}`),
     "",
     "Se quiser recomecar a qualquer momento, envie: menu"
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }
 
 function normalizeMessage(message: string): string {
@@ -67,14 +78,20 @@ export async function handleBotMessage(input: {
   const customerMessage = input.customerMessage.trim();
 
   if (!customerMessage) {
-    return buildBusinessMenu(input.customerName);
+    return buildBusinessMenu({
+      customerName: input.customerName,
+      includeGreeting: true
+    });
   }
 
   if (isRestartRequest(customerMessage)) {
     resetConversationState(input.customerPhone);
     const freshState = createBaseState(input);
     saveConversationState(freshState);
-    return buildBusinessMenu(freshState.customerName);
+    return buildBusinessMenu({
+      customerName: freshState.customerName,
+      includeGreeting: true
+    });
   }
 
   const existingState = getConversationState(input.customerPhone);
@@ -88,11 +105,10 @@ export async function handleBotMessage(input: {
     const selectedOption = resolveBusinessOption(customerMessage);
 
     if (!selectedOption) {
-      return [
-        "Nao identifiquei a opcao escolhida.",
-        "",
-        buildBusinessMenu(state.customerName)
-      ].join("\n");
+      return buildBusinessMenu({
+        customerName: state.customerName,
+        includeGreeting: false
+      });
     }
 
     if (selectedOption.id === "outros") {
@@ -101,7 +117,7 @@ export async function handleBotMessage(input: {
         stage: "awaiting_custom_automation"
       });
 
-      return "Perfeito. Me diga qual tipo de atendimento, processo ou operacao voce quer automatizar no seu WhatsApp.";
+      return "Perfeito. Me diga qual atendimento, processo ou operacao voce quer automatizar no seu WhatsApp.";
     }
 
     saveConversationState({
@@ -111,7 +127,7 @@ export async function handleBotMessage(input: {
       selectedAutomationLabel: selectedOption.label
     });
 
-    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}. Pode ser, por exemplo, atendimento inicial, triagem, agendamento, recuperacao de leads ou suporte.`;
+    return `Perfeito. Agora me diga qual servico, processo ou etapa do seu negocio voce quer automatizar com foco em ${selectedOption.label}. Ex.: atendimento inicial, triagem, agendamento, recuperacao de leads ou suporte.`;
   }
 
   if (state.stage === "awaiting_custom_automation") {
