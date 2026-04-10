@@ -10,6 +10,9 @@ const envSchema = z.object({
   WHATSAPP_ACCESS_TOKEN: z.string().min(1).optional(),
   WHATSAPP_PHONE_NUMBER_ID: z.string().min(1).optional(),
   OPENAI_API_KEY: z.string().min(1).optional(),
+  DATABASE_URL: z.string().url().optional(),
+  BOT_SERVICE_ID: z.string().min(1).default("brasil-smart-bot"),
+  BOT_NAME: z.string().min(1).default("brasil-smart-bot"),
   OPENAI_MODEL: z.string().default("gpt-4.1-mini")
 });
 

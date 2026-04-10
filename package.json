@@ -15,6 +15,7 @@
     "test:send": "tsx src/scripts/sendTestMessage.ts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "openai": "^4.79.2",

@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { config, requireSecret } from "../config.js";
 import { ConsultationReplyInput } from "../types.js";
+import { recordBotTokenUsage } from "./tokenUsageService.js";
 
 const client = new OpenAI({
   apiKey: requireSecret("OPENAI_API_KEY")
@@ -44,8 +45,18 @@ async function runPrompt(input: string): Promise<string> {
       ]
     });
 
+    await recordBotTokenUsage({
+      totalTokens: response.usage?.total_tokens,
+      inputTokens: response.usage?.input_tokens,
+      outputTokens: response.usage?.output_tokens,
+      status: "success"
+    });
+
     return response.output_text.trim();
   } catch (error) {
+    await recordBotTokenUsage({
+      status: "error"
+    });
     console.error("OpenAI consultation generation failed", error);
     throw error;
   }
