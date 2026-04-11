@@ -13,7 +13,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
   BOT_SERVICE_ID: z.string().min(1).default("brasil-smart-bot"),
   BOT_NAME: z.string().min(1).default("brasil-smart-bot"),
-  OPENAI_MODEL: z.string().default("gpt-4.1-mini")
+  OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
+  DAILY_USER_TOKEN_LIMIT: z.coerce.number().int().positive().default(6000)
 });
 
 export const config = envSchema.parse(process.env);

@@ -19,14 +19,24 @@ export type ConversationState = {
   selectedAutomationLabel?: string;
   serviceToAutomate?: string;
   implementationSummary?: string;
+  conversationSummary?: string;
+  recentTopics?: string[];
   turns: number;
   lastUpdatedAt: string;
 };
 
 export type ConsultationReplyInput = {
   customerName: string;
+  customerPhone: string;
   automationGoal: string;
   serviceToAutomate: string;
   customerMessage: string;
   implementationSummary: string;
+  conversationSummary?: string;
+  recentTopics?: string[];
+};
+
+export type HybridReply = {
+  body: string;
+  source: "rule" | "cache" | "model";
 };

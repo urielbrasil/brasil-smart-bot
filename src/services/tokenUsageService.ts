@@ -3,6 +3,10 @@ import { config } from "../config.js";
 
 let schemaReadyPromise: Promise<void> | null = null;
 
+type UserUsageRow = {
+  tokens_used: string | number | null;
+};
+
 function hasDatabaseConfig() {
   return Boolean(config.DATABASE_URL);
 }
@@ -20,7 +24,7 @@ function getTodayDateKey() {
     timeZone: "America/Sao_Paulo",
     year: "numeric",
     month: "2-digit",
-    day: "2-digit"
+    day: "2-digit",
   }).format(new Date());
 }
 
@@ -42,6 +46,8 @@ async function ensureBotUsageTable() {
           output_tokens INTEGER NOT NULL DEFAULT 0,
           bot_name TEXT NOT NULL,
           bot_id TEXT NOT NULL,
+          customer_phone TEXT NOT NULL DEFAULT '',
+          customer_name TEXT NOT NULL DEFAULT '',
           status TEXT NOT NULL,
           model TEXT NOT NULL DEFAULT '',
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -49,8 +55,23 @@ async function ensureBotUsageTable() {
       `;
 
       await sql`
+        ALTER TABLE bot_token_usage
+        ADD COLUMN IF NOT EXISTS customer_phone TEXT NOT NULL DEFAULT ''
+      `;
+
+      await sql`
+        ALTER TABLE bot_token_usage
+        ADD COLUMN IF NOT EXISTS customer_name TEXT NOT NULL DEFAULT ''
+      `;
+
+      await sql`
         CREATE INDEX IF NOT EXISTS bot_token_usage_date_idx
         ON bot_token_usage(usage_date DESC, bot_id)
+      `;
+
+      await sql`
+        CREATE INDEX IF NOT EXISTS bot_token_usage_customer_idx
+        ON bot_token_usage(usage_date DESC, customer_phone)
       `;
     })().catch((error) => {
       schemaReadyPromise = null;
@@ -66,6 +87,8 @@ export async function recordBotTokenUsage(input: {
   inputTokens?: number | null;
   outputTokens?: number | null;
   status: string;
+  customerPhone?: string;
+  customerName?: string;
 }) {
   if (!hasDatabaseConfig()) {
     return;
@@ -85,6 +108,8 @@ export async function recordBotTokenUsage(input: {
         output_tokens,
         bot_name,
         bot_id,
+        customer_phone,
+        customer_name,
         status,
         model
       ) VALUES (
@@ -95,6 +120,8 @@ export async function recordBotTokenUsage(input: {
         ${Math.max(0, input.outputTokens ?? 0)},
         ${config.BOT_NAME},
         ${config.BOT_SERVICE_ID},
+        ${input.customerPhone ?? ""},
+        ${input.customerName ?? ""},
         ${input.status},
         ${config.OPENAI_MODEL}
       )
@@ -102,4 +129,32 @@ export async function recordBotTokenUsage(input: {
   } catch (error) {
     console.error("Failed to persist bot token usage", error);
   }
+}
+
+export async function getDailyUserTokenUsage(customerPhone: string) {
+  if (!hasDatabaseConfig()) {
+    return 0;
+  }
+
+  try {
+    await ensureBotUsageTable();
+    const sql = getSql();
+    const rows = (await sql`
+      SELECT COALESCE(SUM(total_tokens), 0) AS tokens_used
+      FROM bot_token_usage
+      WHERE usage_date = ${getTodayDateKey()}
+        AND customer_phone = ${customerPhone}
+        AND status IN (${"success"}, ${"limit_exceeded"})
+    `) as UserUsageRow[];
+
+    return Number(rows[0]?.tokens_used ?? 0);
+  } catch (error) {
+    console.error("Failed to read daily user token usage", error);
+    return 0;
+  }
+}
+
+export async function hasReachedDailyUserTokenLimit(customerPhone: string) {
+  const tokensUsed = await getDailyUserTokenUsage(customerPhone);
+  return tokensUsed >= config.DAILY_USER_TOKEN_LIMIT;
 }

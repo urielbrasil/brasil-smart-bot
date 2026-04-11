@@ -144,6 +144,7 @@ export async function handleBotMessage(input: {
   if (state.stage === "awaiting_service_to_automate") {
     const scenarioSummary = await createScenarioIntroduction({
       customerName: state.customerName,
+      customerPhone: state.customerPhone,
       automationGoal: state.selectedAutomationLabel ?? "automacao comercial",
       serviceToAutomate: customerMessage
     });
@@ -152,28 +153,35 @@ export async function handleBotMessage(input: {
       ...state,
       stage: "in_consultation",
       serviceToAutomate: customerMessage,
-      implementationSummary: scenarioSummary,
+      implementationSummary: scenarioSummary.reply,
+      conversationSummary: scenarioSummary.summary,
+      recentTopics: scenarioSummary.recentTopics,
       turns: state.turns + 1
     });
 
-    return scenarioSummary;
+    return scenarioSummary.reply;
   }
 
   const scenarioReply = await generateScenarioReply({
     customerName: state.customerName,
+    customerPhone: state.customerPhone,
     automationGoal: state.selectedAutomationLabel ?? "automacao comercial",
     serviceToAutomate: state.serviceToAutomate ?? "atendimento inicial",
     customerMessage,
     implementationSummary:
       state.implementationSummary ??
-      "Implantacao consultiva no WhatsApp com atendimento inteligente, qualificacao automatica e repasse para a equipe no momento certo."
+      "Implantacao consultiva no WhatsApp com atendimento inteligente, qualificacao automatica e repasse para a equipe no momento certo.",
+    conversationSummary: state.conversationSummary,
+    recentTopics: state.recentTopics
   });
 
   saveConversationState({
     ...state,
     stage: "in_consultation",
+    conversationSummary: scenarioReply.summary,
+    recentTopics: scenarioReply.recentTopics,
     turns: state.turns + 1
   });
 
-  return scenarioReply;
+  return scenarioReply.reply;
 }
